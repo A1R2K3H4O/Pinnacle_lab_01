@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Station</title>
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --card-bg: #ffffff;
+            --header-bg: #ffffff;
+            --accent-color: #2e7d32;
+            --button-bg: #6d4c41;
+            --button-hover: #5d4037;
+            --secondary-bg: #8d6e63;
+            --secondary-hover: #7e5b50;
+            --shadow-color: rgba(0,0,0,0.1);
+            --rating-color: #ff9800;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1e1e1e;
+            --text-color: #e0e0e0;
+            --card-bg: #2a2a2a;
+            --header-bg: #252525;
+            --accent-color: #4caf50;
+            --button-bg: #8d6e63;
+            --button-hover: #a1887f;
+            --secondary-bg: #6d4c41;
+            --secondary-hover: #5d4037;
+            --shadow-color: rgba(0,0,0,0.3);
+            --rating-color: #ffb300;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--header-bg);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            position: relative;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+        }
+
+        .cart-icon {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            background-color: var(--secondary-bg);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cart-icon:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--button-bg);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cart-dropdown {
+            display: none;
+            position: fixed;
+            top: 70px;
+            right: 1.5rem;
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 6px 18px var(--shadow-color);
+            padding: 1.5rem;
+            width: 320px;
+            z-index: 100;
+            max-height: 400px;
+            overflow-y: auto;
+            font-size: 1rem;
+        }
+
+        .cart-dropdown.active {
+            display: block;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--shadow-color);
+            font-weight: 500;
+            align-items: center;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .remove-item {
+            background-color: var(--secondary-bg);
+            color: white;
+            border: none;
+            padding: 0.3rem 0.7rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .remove-item:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 5rem;
+            background-color: var(--secondary-bg);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            box-shadow: 0 2px 8px var(--shadow-color);
+            z-index: 100;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        nav {
+            margin-top: 1rem;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+        }
+
+        nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--accent-color);
+        }
+
+        .hero {
+            position: relative;
+            height: 100vh;
+            background: url('https://images.unsplash.com/photo-1501004318641-b39e6451bec6?q=80&w=2073&auto=format&fit=crop') no-repeat center center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(46,125,50,0.4), rgba(0,0,0,0.5));
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 4.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.8rem;
+            margin-bottom: 2.5rem;
+            font-weight: 400;
+        }
+
+        .hero .btn {
+            display: inline-block;
+            padding: 1.2rem 2.5rem;
+            background-color: var(--button-bg);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .hero .btn:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .shop-section {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 4rem 2rem;
+            text-align: center;
+            background: linear-gradient(135deg, var(--card-bg), #f0f4f1);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px var(--shadow-color);
+        }
+
+        .shop-section h2 {
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            font-size: 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .shop-filters {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .shop-filters select {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--shadow-color);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-weight: 500;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .shop-filters select:hover {
+            border-color: var(--accent-color);
+        }
+
+        .cart-summary {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: right;
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .cart-summary span {
+            color: var(--button-bg);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 6px 18px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px var(--shadow-color);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .product-card h3 {
+            font-size: 1.5rem;
+            color: var(--text-color);
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .product-card p {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        .product-card .rating {
+            color: var(--rating-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .product-card button {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-right: 0.75rem;
+        }
+
+        .product-card button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .product-card .quick-view {
+            background-color: var(--secondary-bg);
+            color: white;
+            border: none;
+            padding: 0.9rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .product-card .quick-view:hover {
+            background-color: var(--secondary-hover);
+            transform: translateY(-2px);
+        }
+
+        .about-section {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #e8f5e9, var(--card-bg));
+            border-radius: 15px;
+            box-shadow: 0 8px 20px var(--shadow-color);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .about-section h2 {
+            color: var(--accent-color);
+            margin-bottom: 2rem;
+            font-size: 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .about-section p {
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 1.2rem;
+            line-height: 1.8;
+            font-weight: 400;
+        }
+
+        .faq-section {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, var(--card-bg), #f0f4f1);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px var(--shadow-color);
+            text-align: center;
+        }
+
+        .faq-section h2 {
+            color: var(--accent-color);
+            margin-bottom: 2.5rem;
+            font-size: 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .faq-item {
+            margin-bottom: 1.5rem;
+            border-radius: 10px;
+            overflow: hidden;
+            background-color: var(--card-bg);
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: transform 0.3s;
+        }
+
+        .faq-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .faq-question {
+            background-color: var(--card-bg);
+            padding: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .faq-question:hover {
+            background-color: color-mix(in srgb, var(--card-bg) 90%, var(--accent-color));
+        }
+
+        .faq-answer {
+            padding: 1.5rem;
+            display: none;
+            color: var(--text-color);
+            background-color: var(--card-bg);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .faq-answer.active {
+            display: block;
+        }
+
+        .contact-section {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, #e8f5e9, var(--card-bg));
+            border-radius: 15px;
+            box-shadow: 0 8px 20px var(--shadow-color);
+            text-align: center;
+        }
+
+        .contact-section h2 {
+            color: var(--accent-color);
+            margin-bottom: 2.5rem;
+            font-size: 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .contact-info div {
+            margin: 1.5rem;
+            padding: 1.5rem;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: transform 0.3s;
+        }
+
+        .contact-info div:hover {
+            transform: translateY(-5px);
+        }
+
+        .contact-info h3 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .contact-info p {
+            color: var(--text-color);
+            margin: 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .contact-form {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: left;
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 6px 18px var(--shadow-color);
+        }
+
+        .contact-form label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .contact-form input,
+        .contact-form textarea,
+        .contact-form select {
+            width: 100%;
+            padding: 0.9rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--shadow-color);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            box-sizing: border-box;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-weight: 500;
+            transition: border-color 0.3s;
+        }
+
+        .contact-form input:focus,
+        .contact-form textarea:focus,
+        .contact-form select:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        .contact-form textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .captcha {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .captcha input {
+            margin-right: 1rem;
+        }
+
+        .contact-form button {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.2rem;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .contact-form button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .location-section {
+            max-width: 1400px;
+            margin: 4rem auto;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, var(--card-bg), #f0f4f1);
+            border-radius: 15px;
+            box-shadow: 0 8px 20px var(--shadow-color);
+            text-align: center;
+        }
+
+        .location-section h2 {
+            color: var(--accent-color);
+            margin-bottom: 2.5rem;
+            font-size: 3rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .location-details {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 3rem;
+            gap: 2rem;
+        }
+
+        .location-details div {
+            margin: 1.5rem;
+            padding: 2rem;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            transition: transform 0.3s;
+            max-width: 400px;
+            text-align: left;
+        }
+
+        .location-details div:hover {
+            transform: translateY(-5px);
+        }
+
+        .location-details h3 {
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .location-details p {
+            color: var(--text-color);
+            margin: 0.75rem 0;
+            font-size: 1.1rem;
+        }
+
+        .map {
+            height: 450px;
+            border-radius: 15px;
+            margin-top: 2rem;
+            border: none;
+            width: 100%;
+            box-shadow: 0 6px 18px var(--shadow-color);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 550px;
+            position: relative;
+            color: var(--text-color);
+            box-shadow: 0 8px 20px var(--shadow-color);
+        }
+
+        .modal-content h3 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .modal-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .modal-content button {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .modal-content button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: var(--accent-color);
+        }
+
+        .chatbot-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--secondary-bg);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            z-index: 100;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .chatbot-button:hover {
+            background-color: var(--secondary-hover);
+            transform: translateY(-2px);
+        }
+
+        .chatbot-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 320px;
+            height: 450px;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 6px 18px var(--shadow-color);
+            display: none;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .chatbot-header {
+            background-color: var(--button-bg);
+            color: white;
+            padding: 0.75rem;
+            border-top-left-radius: 15px;
+            border-top-right-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .chatbot-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .chatbot-header button:hover {
+            color: var(--secondary-hover);
+        }
+
+        .chatbot-messages {
+            flex-grow: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background-color: var(--card-bg);
+        }
+
+        .chatbot-message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .chatbot-message.bot {
+            color: var(--accent-color);
+            font-weight: 500;
+            background-color: #e8f5e9;
+            align-self: flex-start;
+        }
+
+        .chatbot-message.user {
+            text-align: right;
+            color: var(--text-color);
+            background-color: #dcedc8;
+            align-self: flex-end;
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 0.75rem;
+            border-top: 1px solid var(--shadow-color);
+        }
+
+        .chatbot-input input {
+            flex-grow: 1;
+            border: 2px solid var(--shadow-color);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-right: 0.75rem;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            font-weight: 500;
+            transition: border-color 0.3s;
+        }
+
+        .chatbot-input input:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        .chatbot-input button {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        .chatbot-input button:hover {
+            background-color: var(--button-hover);
+            transform: translateY(-2px);
+        }
+
+        footer {
+            background-color: var(--accent-color);
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            margin-top: 4rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 600px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            .hero p {
+                font-size: 1.2rem;
+            }
+            nav ul {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            .shop-section h2 {
+                font-size: 2.2rem;
+            }
+            .shop-filters {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            .cart-summary {
+                text-align: center;
+            }
+            .about-section h2 {
+                font-size: 2.2rem;
+            }
+            .faq-section h2 {
+                font-size: 2.2rem;
+            }
+            .contact-section h2 {
+                font-size: 2.2rem;
+            }
+            .location-section h2 {
+                font-size: 2.2rem;
+            }
+            .contact-info {
+                flex-direction: column;
+                align-items: center;
+            }
+            .location-details {
+                flex-direction: column;
+                align-items: center;
+            }
+            .cart-icon {
+                top: 5rem;
+                right: 1.5rem;
+            }
+            .theme-toggle {
+                top: 5rem;
+                right: 5.5rem;
+            }
+            .cart-dropdown {
+                top: 80px;
+                right: 1.5rem;
+                width: 90%;
+            }
+            .chatbot-window {
+                width: 90%;
+                right: 5%;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    <button class="cart-icon" onclick="toggleCartDropdown()">🛒<span class="cart-count" id="cartCount">0</span></button>
+    <div class="cart-dropdown" id="cartDropdown">
+        <h3>Cart</h3>
+        <div id="cartItems"></div>
+        <p>Total: ₹<span id="cartTotal">0.00</span></p>
+    </div>
+    <header>
+        <img src="WhatsApp Image 2025-07-02 at 13.10.59_c57f6656.jpg" alt="Plant Station Logo" class="logo">
+        <h1>Plant Station</h1>
+        <nav>
+            <ul>
+                <li><a href="#shop">Shop</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#location">Address</a></li>
+            </ul>
+        </nav>
+    </header>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Plant Station</h1>
+            <p>Embrace the Green Revolution</p>
+            <a href="#shop" class="btn">Explore Now</a>
+        </div>
+    </section>
+    <section class="shop-section" id="shop">
+        <h2>Discover Our Collection</h2>
+        <div class="shop-filters">
+            <select id="categoryFilter" onchange="filterProducts()">
+                <option value="all">All Categories</option>
+                <option value="low-light">Indoors</option>
+                <option value="high-light">Outdoors</option>
+            </select>
+            <select id="priceFilter" onchange="filterProducts()">
+                <option value="all">All Prices</option>
+                <option value="100-200">₹100 - ₹200</option>
+                <option value="200-400">₹200 - ₹400</option>
+            </select>
+        </div>
+        <div class="cart-summary">
+            <span id="cartCount">Items in Cart: 0</span>
+        </div>
+        <div class="product-grid" id="productGrid">
+            <div class="product-card" data-category="low-light" data-price="150">
+                <img src="Alocasia-Amazonica-‘Polly.jpg.webp" alt="Alocasia">
+                <h3>Alocasia</h3>
+                <p>₹150</p>
+                <div class="rating">★★★★☆ (4.2)</div>
+                <button onclick="addToCart('Alocasia', 150)">Add to Cart</button>
+                <button class="quick-view" onclick="showQuickView('Alocasia', 150, 'Indoors, easy care', '★★★★☆ (4.2)')">Quick View</button>
+            </div>
+            <div class="product-card" data-category="low-light" data-price="180">
+                <img src="20190726080052_file_5d3b5bf494ecc_5d3b5c0d289ec.avif" alt="Snake Plant">
+                <h3>Snake Plant</h3>
+                <p>₹180</p>
+                <div class="rating">★★★★★ (4.8)</div>
+                <button onclick="addToCart('Snake Plant', 180)">Add to Cart</button>
+                <button class="quick-view" onclick="showQuickView('Snake Plant', 180, 'Low light, drought-tolerant', '★★★★★ (4.8)')">Quick View</button>
+            </div>
+            <div class="product-card" data-category="high-light" data-price="250">
+                <img src="Syngonium-podophyllum.jpg.webp" alt="Arrowhead Vine">
+                <h3>Arrowhead Vine</h3>
+                <p>₹250</p>
+                <div class="rating">★★★★☆ (4.0)</div>
+                <button onclick="addToCart('Arrowhead Vine', 250)">Add to Cart</button>
+                <button class="quick-view" onclick="showQuickView('Arrowhead Vine', 250, 'Bright indirect light, lush foliage', '★★★★☆ (4.0)')">Quick View</button>
+            </div>
+            <div class="product-card" data-category="high-light" data-price="350">
+                <img src="OIP.jpeg" alt="Fiddle Leaf Fig">
+                <h3>Fiddle Leaf Fig</h3>
+                <p>₹350</p>
+                <div class="rating">★★★☆☆ (3.5)</div>
+                <button onclick="addToCart('Fiddle Leaf Fig', 350)">Add to Cart</button>
+                <button class="quick-view" onclick="showQuickView('Fiddle Leaf Fig', 350, 'Bright light, regular watering', '★★★☆☆ (3.5)')">Quick View</button>
+            </div>
+            <div class="product-card" data-category="high-light" data-price="400">
+                <img src="OIP (1).jpeg" alt="Adenium">
+                <h3>Adenium</h3>
+                <p>₹400</p>
+                <div class="rating">★★★☆☆ (3.5)</div>
+                <button onclick="addToCart('Adenium', 400)">Add to Cart</button>
+                <button class="quick-view" onclick="showQuickView('Adenium', 400, 'Bright light, regular watering', '★★★☆☆ (3.5)')">Quick View</button>
+            </div>
+            <div class="product-card" data-category="high-light" data-price="350">
+                <img src="Coleus-9395718927_8f1245e1f0_k-594350ce3df78c537bcb6c18.jpg" alt="Coleus">
+                <h3>Coleus</h3>
+                <p>₹350</p>
+                <div class="rating">★★★☆☆ (3.5)</div>
+                <button onclick="addToCart('Coleus', 350)">Add to Cart</button>
+                <button class="quick-view" onclick="showQuickView('Coleus', 350, 'Bright light, regular watering', '★★★☆☆ (3.5)')">Quick View</button>
+            </div>
+            <div class="product-card" data-category="high-light" data-price="400">
+                <img src="Chlorophytum-comosum.webp" alt="Spider Plant">
+                <h3>Spider Plant</h3>
+                <p>₹400</p>
+                <div class="rating">★★★☆☆ (3.5)</div>
+                <button onclick="addToCart('Spider Plant', 400)">Add to Cart</button>
+                <button class="quick-view" onclick="showQuickView('Spider Plant', 400, 'Bright light, regular watering', '★★★☆☆ (3.5)')">Quick View</button>
+            </div>
+            <div class="product-card" data-category="high-light" data-price="250">
+                <img src="jade-plant.webp" alt="Jade Plant">
+                <h3>Jade Plant</h3>
+                <p>₹250</p>
+                <div class="rating">★★★☆☆ (3.5)</div>
+                <button onclick="addToCart('Jade Plant', 250)">Add to Cart</button>
+                <button class="quick-view" onclick="showQuickView('Jade Plant', 250, 'Bright light, regular watering', '★★★☆☆ (3.5)')">Quick View</button>
+            </div>
+        </div>
+    </section>
+    <section class="about-section" id="about">
+        <h2>About Us</h2>
+        <p>Founded in 2025, Plant Station is at the forefront of the urban green movement, delivering a curated selection of premium indoor and outdoor plants. Our mission is to transform living spaces into thriving ecosystems with sustainable, eco-friendly solutions. Powered by a team of expert botanists, we blend innovation with nature to inspire a greener lifestyle.</p>
+        <p>Whether you're a novice or a plant enthusiast, our cutting-edge care tips and premium quality plants are designed to elevate your home environment. Join us in redefining green living!</p>
+    </section>
+    <section class="faq-section" id="faq">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">How to Optimize Plant Watering?</div>
+            <div class="faq-answer">Watering depends on plant type and climate. Use a moisture meter or check the top 2 inches of soil—water only when dry. Tailor care to each species for best results!</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">What Lighting is Ideal?</div>
+            <div class="faq-answer">Most plants thrive in bright, indirect light. Low-light lovers like Snake Plants adapt well, while high-light plants like Fiddle Leaf Figs need ample sunshine.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">Return Policy for Damaged Plants?</div>
+            <div class="faq-answer">We offer a 30-day return on defective plants. Contact us with your purchase receipt and photos for a hassle-free exchange or refund.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">Monstera Care Essentials?</div>
+            <div class="faq-answer">Monstera Deliciosa flourishes in bright, indirect light with well-draining soil. Water when the top layer dries, and ensure good air circulation.</div>
+        </div>
+    </section>
+    <section class="contact-section" id="contact">
+        <h2>Contact Us</h2>
+        <div class="contact-info">
+            <div>
+                <h3>Phone</h3>
+                <p>+91-8017773643</p>
+            </div>
+            <div>
+                <h3>Email</h3>
+                <p>support@plantstation.com</p>
+            </div>
+            <div>
+                <h3>Live Chat</h3>
+                <p>Available 24/7</p>
+            </div>
+        </div>
+        <div class="contact-form">
+            <form id="contactForm" onsubmit="return submitContactForm(event)">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required>
+                <label for="email">Email Address *</label>
+                <input type="email" id="email" name="email" required>
+                <label for="subject">Subject *</label>
+                <select id="subject" name="subject" required>
+                    <option value="">Select a subject</option>
+                    <option value="order">Order Inquiry</option>
+                    <option value="support">Customer Support</option>
+                    <option value="feedback">Feedback</option>
+                    <option value="other">Other</option>
+                </select>
+                <label for="message">Message *</label>
+                <textarea id="message" name="message" required></textarea>
+                <div class="captcha">
+                    <input type="checkbox" id="captcha" name="captcha" required>
+                    <label for="captcha">I'm not a robot</label>
+                </div>
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </section>
+    <section class="location-section" id="location">
+        <h2>Our Locations</h2>
+        <div class="location-details">
+            <div>
+                <h3>Plant Station - Lalgola</h3>
+                <p>Lalgola, Murshidabad</p>
+                <p>Pincode: 742148</p>
+                <p>Phone: +91-8017773643</p>
+                <p>Hours: Mon-Fri 9 AM - 7 PM, Sat 10 AM - 5 PM</p>
+            </div>
+        </div>
+        <iframe
+            class="map"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3622.765385073186!2d88.25430731509776!3d24.42299508426034!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39fb5a8b4f7b5e7b%3A0x2b8c7b4f1c7f5a8b!2sLalgola%2C%20West%20Bengal%20742148!5e0!3m2!1sen!2sin!4v1667901234567!5m2!1sen!2sin"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+    </section>
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <h3>Thank You!</h3>
+            <p>Your message has been sent successfully. We will get back to you soon.</p>
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+    <div class="modal" id="quickViewModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeQuickView()">×</button>
+            <h3 id="quickViewTitle"></h3>
+            <p id="quickViewPrice"></p>
+            <p id="quickViewDescription"></p>
+            <div id="quickViewRating"></div>
+            <button onclick="addToCartFromModal()">Add to Cart</button>
+        </div>
+    </div>
+    <button class="chatbot-button" onclick="toggleChatbot()">💬</button>
+    <div class="chatbot-window" id="chatbot-window">
+        <div class="chatbot-header">
+            <span>PlantBot</span>
+            <button onclick="toggleChatbot()">X</button>
+        </div>
+        <div class="chatbot-messages" id="chatbot-messages">
+            <div class="chatbot-message bot">Hello! I'm PlantBot. How can I help you today? Ask about plant care or our products!</div>
+        </div>
+        <div class="chatbot-input">
+            <input type="text" id="chatbot-input" placeholder="Type your message...">
+            <button onclick="sendChatbotMessage()">Send</button>
+        </div>
+    </div>
+    <footer>
+        <p>© 2025 Plant Station. All rights reserved. Call Us Now! +91-8017773643</p>
+    </footer>
+    <script>
+        let cartCount = 0;
+        let cartItems = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.body.setAttribute('data-theme', savedTheme);
+            document.querySelector('.theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+            const savedCart = localStorage.getItem('cartItems');
+            if (savedCart) {
+                cartItems = JSON.parse(savedCart);
+                cartCount = cartItems.length;
+                updateCartDisplay();
+            }
+        });
+
+        function toggleTheme() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            document.querySelector('.theme-toggle').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        function toggleCartDropdown() {
+            const dropdown = document.getElementById('cartDropdown');
+            dropdown.classList.toggle('active');
+            updateCartDisplay();
+        }
+
+        function addToCart(itemName, price) {
+            cartCount++;
+            cartItems.push({ name: itemName, price: price });
+            localStorage.setItem('cartItems', JSON.stringify(cartItems));
+            updateCartDisplay();
+            alert(`${itemName} added to cart! Total items: ${cartCount}`);
+        }
+
+        function addToCartFromModal() {
+            const title = document.getElementById('quickViewTitle').textContent;
+            const priceText = document.getElementById('quickViewPrice').textContent.replace('₹', '');
+            const price = parseFloat(priceText);
+            addToCart(title, price);
+            closeQuickView();
+        }
+
+        function removeFromCart(index) {
+            if (index >= 0 && index < cartItems.length) {
+                cartItems.splice(index, 1);
+                cartCount--;
+                localStorage.setItem('cartItems', JSON.stringify(cartItems));
+                updateCartDisplay();
+                alert('Item removed from cart!');
+            }
+        }
+
+        function updateCartDisplay() {
+            const countElement = document.getElementById('cartCount');
+            const cartItemsElement = document.getElementById('cartItems');
+            const totalElement = document.getElementById('cartTotal');
+
+            countElement.textContent = cartCount;
+            cartItemsElement.innerHTML = '';
+            let total = 0;
+
+            cartItems.forEach((item, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                itemDiv.innerHTML = `${item.name} - ₹${item.price.toFixed(2)} <button class="remove-item" onclick="removeFromCart(${index})">Remove</button>`;
+                cartItemsElement.appendChild(itemDiv);
+                total += item.price;
+            });
+
+            totalElement.textContent = total.toFixed(2);
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        function filterProducts() {
+            const category = document.getElementById('categoryFilter').value;
+            const priceRange = document.getElementById('priceFilter').value;
+            const products = document.querySelectorAll('.product-card');
+
+            products.forEach(product => {
+                const productCategory = product.getAttribute('data-category');
+                const productPrice = parseFloat(product.getAttribute('data-price'));
+                let show = true;
+
+                if (category !== 'all' && productCategory !== category) show = false;
+                if (priceRange !== 'all') {
+                    const [min, max] = priceRange.split('-').map(Number);
+                    if (productPrice < min || productPrice > max) show = false;
+                }
+
+                product.style.display = show ? 'block' : 'none';
+            });
+        }
+
+        function showQuickView(title, price, description, rating) {
+            document.getElementById('quickViewTitle').textContent = title;
+            document.getElementById('quickViewPrice').textContent = `₹${price.toFixed(2)}`;
+            document.getElementById('quickViewDescription').textContent = description;
+            document.getElementById('quickViewRating').textContent = rating;
+            document.getElementById('quickViewModal').style.display = 'flex';
+        }
+
+        function closeQuickView() {
+            document.getElementById('quickViewModal').style.display = 'none';
+        }
+
+        function toggleChatbot() {
+            const chatbotWindow = document.getElementById('chatbot-window');
+            chatbotWindow.style.display = chatbotWindow.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function sendChatbotMessage() {
+            const input = document.getElementById('chatbot-input');
+            const messages = document.getElementById('chatbot-messages');
+            const userMessage = input.value.trim();
+
+            if (userMessage) {
+                const userDiv = document.createElement('div');
+                userDiv.className = 'chatbot-message user';
+                userDiv.textContent = userMessage;
+                messages.appendChild(userDiv);
+
+                const botDiv = document.createElement('div');
+                botDiv.className = 'chatbot-message bot';
+                botDiv.textContent = getBotResponse(userMessage);
+                messages.appendChild(botDiv);
+
+                messages.scrollTop = messages.scrollHeight;
+                input.value = '';
+            }
+        }
+
+        function getBotResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            if (lowerMessage.includes('care') || lowerMessage.includes('how to take care')) {
+                return 'Most plants thrive in bright, indirect light and need watering when the top 2 inches of soil are dry. Ask about specific care for your plant!';
+            } else if (lowerMessage.includes('monstera')) {
+                return 'Monstera Deliciosa loves bright, indirect light and well-draining soil. Water when the top layer dries. Price: ₹250!';
+            } else if (lowerMessage.includes('snake plant')) {
+                return 'Snake Plants need low light and water every 2-3 weeks. Available for ₹180!';
+            } else if (lowerMessage.includes('fiddle leaf') || lowerMessage.includes('fig')) {
+                return 'Fiddle Leaf Figs require bright light and regular watering. Avoid drafts. Price: ₹350!';
+            } else if (lowerMessage.includes('pothos')) {
+                return 'Golden Pothos tolerates low light and irregular watering. Grab one for ₹150!';
+            } else if (lowerMessage.includes('help') || lowerMessage.includes('hi') || lowerMessage.includes('hello')) {
+                return 'Hi! I’m PlantBot, your guide to plant care and products. What can I assist you with?';
+            } else {
+                return 'Sorry, I didn’t catch that! Try asking about plant care or products like Monstera or Snake Plant.';
+            }
+        }
+
+        function submitContactForm(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+            const captcha = document.getElementById('captcha').checked;
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                alert('Please enter a valid email address.');
+                return false;
+            }
+
+            if (!captcha) {
+                alert('Please verify you are not a robot.');
+                return false;
+            }
+
+            if (name && email && subject && message) {
+                document.getElementById('contactForm').reset();
+                showModal();
+            } else {
+                alert('Please fill out all required fields.');
+            }
+            return false;
+        }
+
+        function showModal() {
+            const modal = document.getElementById('confirmationModal');
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('confirmationModal');
+            modal.style.display = 'none';
+        }
+
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            const isActive = answer.classList.contains('active');
+            document.querySelectorAll('.faq-answer').forEach(item => item.classList.remove('active'));
+            if (!isActive) {
+                answer.classList.add('active');
+            }
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+    <script>
+        function initMap() {
+            const lalgola = { lat: 24.422995, lng: 88.254307 };
+            const map = new google.maps.Map(document.querySelector('.map'), {
+                center: lalgola,
+                zoom: 14,
+                styles: [
+                    { elementType: 'geometry', stylers: [{ color: '#f5f5f5' }] },
+                    { elementType: 'labels.text.fill', stylers: [{ color: '#333' }] },
+                    { elementType: 'labels.text.stroke', stylers: [{ color: '#fff' }] },
+                    {
+                        featureType: 'administrative',
+                        elementType: 'geometry.stroke',
+                        stylers: [{ color: '#ccc' }]
+                    },
+                    {
+                        featureType: 'landscape.man_made',
+                        elementType: 'geometry.fill',
+                        stylers: [{ color: '#d9e3ea' }]
+                    },
+                    {
+                        featureType: 'poi',
+                        elementType: 'geometry.fill',
+                        stylers: [{ color: '#e0e0e0' }]
+                    },
+                    {
+                        featureType: 'road',
+                        elementType: 'geometry',
+                        stylers: [{ color: '#ffffff' }]
+                    },
+                    {
+                        featureType: 'water',
+                        elementType: 'geometry',
+                        stylers: [{ color: '#a7d9f5' }]
+                    }
+                ]
+            });
+            new google.maps.Marker({
+                position: lalgola,
+                map,
+                title: "Plant Station - Lalgola"
+            });
+
+            const observer = new MutationObserver(() => {
+                const isDark = document.body.getAttribute('data-theme') === 'dark';
+                map.setOptions({
+                    styles: isDark ? [
+                        { elementType: 'geometry', stylers: [{ color: '#1e1e1e' }] },
+                        { elementType: 'labels.text.fill', stylers: [{ color: '#e0e0e0' }] },
+                        { elementType: 'labels.text.stroke', stylers: [{ color: '#2a2a2a' }] },
+                        {
+                            featureType: 'administrative',
+                            elementType: 'geometry.stroke',
+                            stylers: [{ color: '#444' }]
+                        },
+                        {
+                            featureType: 'landscape.man_made',
+                            elementType: 'geometry.fill',
+                            stylers: [{ color: '#383838' }]
+                        },
+                        {
+                            featureType: 'poi',
+                            elementType: 'geometry.fill',
+                            stylers: [{ color: '#4a4a4a' }]
+                        },
+                        {
+                            featureType: 'road',
+                            elementType: 'geometry',
+                            stylers: [{ color: '#2a2a2a' }]
+                        },
+                        {
+                            featureType: 'water',
+                            elementType: 'geometry',
+                            stylers: [{ color: '#335566' }]
+                        }
+                    ] : [
+                        { elementType: 'geometry', stylers: [{ color: '#f5f5f5' }] },
+                        { elementType: 'labels.text.fill', stylers: [{ color: '#333' }] },
+                        { elementType: 'labels.text.stroke', stylers: [{ color: '#fff' }] },
+                        {
+                            featureType: 'administrative',
+                            elementType: 'geometry.stroke',
+                            stylers: [{ color: '#ccc' }]
+                        },
+                        {
+                            featureType: 'landscape.man_made',
+                            elementType: 'geometry.fill',
+                            stylers: [{ color: '#d9e3ea' }]
+                        },
+                        {
+                            featureType: 'poi',
+                            elementType: 'geometry.fill',
+                            stylers: [{ color: '#e0e0e0' }]
+                        },
+                        {
+                            featureType: 'road',
+                            elementType: 'geometry',
+                            stylers: [{ color: '#ffffff' }]
+                        },
+                        {
+                            featureType: 'water',
+                            elementType: 'geometry',
+                            stylers: [{ color: '#a7d9f5' }]
+                        }
+                    ]
+                });
+            });
+            observer.observe(document.body, { attributes: true, attributeFilter: ['data-theme'] });
+        }
+    </script>
+</body>
+</html>
